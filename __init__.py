@@ -1,5 +1,4 @@
 import hashlib
-import json
 import socket
 import sys
 from collections import defaultdict, deque
@@ -84,11 +83,14 @@ def update_dynamic_dns(
     def _update_ip():
         while True:
             try:
-                if socket.gethostbyname(f"{subdomain}.{domain}") == get_ip_of_this_pc():
+                myipnow = get_ip_of_this_pc()
+                so=socket.gethostbyname(f"{subdomain}.{domain}")
+                if so == myipnow:
+                    ipconfig.allipscans[f"{subdomain}.{domain}"].append(myipnow)
                     kthread_sleep.sleep(frequency)
                     continue
                 passwordhash = hashlib.md5(password.encode("utf-8")).hexdigest()
-                myipnow = get_ip_of_this_pc()
+
                 linkx = f"http://api.dynu.com/nic/update?hostname={subdomain}.{domain}&myip={myipnow}&myipv6=no&password={passwordhash}"
 
                 with requests.get(linkx) as fax:
